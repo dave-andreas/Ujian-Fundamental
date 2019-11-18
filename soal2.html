@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Madding</title>
+    <style>
+        tr,td,table{
+            border: 3px solid rgb(54, 81, 105);
+            border-collapse: collapse ;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+    <center>
+        <h1>Madding</h1>
+        Username : <input id="username" type="text"><br><br>
+        Password : <input id="password" type="text"><br><br>
+        <button id="login" onclick="login()"> Login </button>
+        <br><br>
+        <table>
+            <thead>
+                <tr>
+                    <td>No. </td>
+                    <td>Kegiatan </td>
+                    <td>Hari </td>
+                    <td>Poster </td>
+                    <td>Act </td>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+            <tfoot>
+
+            </tfoot>
+        </table>
+        <h2></h2>
+        <p></p>
+    </center>
+</body>
+<script>
+    class dataUser{
+        constructor(a,b,c){
+            this.username=a
+            this.password=b
+            this.role=c
+        }
+    }
+    var listUser=[
+        new dataUser('andreas','111','user'),
+        new dataUser('david','222','admin')
+    ]
+    class Madding{
+        constructor(a,b,c){
+            this.kegiatan=a
+            this.hari=b
+            this.poster=c
+        }
+    }
+    var listMadding=[
+        new Madding('Lari','Senin','gambar lari'),
+        new Madding('Estafet','Selasa','gambar estafet')
+    ]
+    const printUser=(a)=>{
+        var output=''
+        a.forEach((val,index)=>{
+            output+=`<tr>
+                <td>${index+1}</td>
+                <td>${val.kegiatan}</td>
+                <td>${val.hari}</td>
+                <td><img src=${val.poster} height='100px'></td>
+                <td></td>
+                </tr>`
+        })
+        document.getElementsByTagName('tbody')[0].innerHTML=output
+    }
+    const printAdmin=(a)=>{
+        var output=''
+        a.forEach((val,index)=>{
+            output+=`<tr>
+                <td>${index+1}</td>
+                <td>${val.kegiatan}</td>
+                <td>${val.hari}</td>
+                <td><img src=${val.poster} height='100px'></td>
+                <td id='konfirm' class='konfirm'><button onclick='hapus(${index})'>Delete</button><button onclick='ubah(${index})'>Edit</button></td>
+                </tr>`
+        })
+        document.getElementsByTagName('tbody')[0].innerHTML=output
+    }
+    var dataLogin={}
+    const login=()=>{
+        userLogin=document.getElementById('username').value
+        passLogin=document.getElementById('password').value
+        var login=false
+        for(i=0;i<listUser.length;i++){
+            if(userLogin==listUser[i].username && passLogin==listUser[i].password){
+                login=true
+                dataLogin=listUser[i]
+            }
+        }
+        if(login){
+            console.log('masuk')
+            if(dataLogin.role=='user'){
+                printUser(listMadding)
+                document.getElementsByTagName('h2')[0].innerHTML='anda sebagai user'
+                document.getElementsByTagName('p')[0].innerHTML=`<button onclick='logout()'>Logout</button>`
+            }else{
+                printAdmin(listMadding)
+                document.getElementsByTagName('tfoot')[0].innerHTML=`<tr>
+                    <td></td>
+                    <td><input id='kegiatanNew' type='text' class='tambah'></td>
+                    <td><select class='tambah'>
+                        <option>Senin</option>
+                        <option>Selasa</option>
+                        <option>Rabu</option>
+                        <option>Kamis</option>
+                        <option>Jumat</option>
+                        <option>Sabtu</option>
+                        <option>Minggu</option></select></td>
+                    <td><input id='posterNew' type='text' class='tambah'></td>
+                    <td><button onclick='tambah()'>Tambah</button></td>
+                    </tr>`
+                document.getElementsByTagName('h2')[0].innerHTML='anda sebagai admin'
+                document.getElementsByTagName('p')[0].innerHTML=`<button onclick='logout()'>Logout</button>`
+            }
+        }else{
+            document.getElementsByTagName('h2')[0].innerHTML='anda tidak bisa masuk'
+        }
+    }
+    const tambah=()=>{
+        input=document.getElementsByClassName('tambah')
+        kegiatanNew=input[0].value
+        hariNew=input[1].value
+        posterNew=input[2].value
+        listMadding.push(new Madding(kegiatanNew,hariNew,posterNew))
+        printAdmin(listMadding)
+    }
+    yes=(a)=>{
+        listMadding.splice(a,1)
+        printAdmin(listMadding)
+    }
+    no=()=>{
+        printAdmin(listMadding)
+    }
+    const hapus=(a)=>{
+        document.getElementsByClassName('konfirm')[a].innerHTML=`<button class='yesno' onclick='yes(${a})'>Yes</button> <button class='yesno' onclik='no()'>No</button>`
+    }
+    const ubah=(a)=>{
+        document.getElementsByTagName('tr')[a+1].innerHTML=`
+            <td></td>
+            <td><input id='kegiatanNew' type='text' class='edit'></td>
+            <td><select class='edit'>
+                <option>Senin</option>
+                <option>Selasa</option>
+                <option>Rabu</option>
+                <option>Kamis</option>
+                <option>Jumat</option>
+                <option>Sabtu</option>
+                <option>Minggu</option></select></td>
+            <td><input id='posterNew' type='text' class='edit'></td>
+            <td><button onclick='cancel()'>Cancel</button><button onclick='save(${a})'>Save</button></td>
+            `
+    }
+    cancel=()=>{
+        printAdmin(listMadding)
+    }
+    save=(a)=>{
+        input=document.getElementsByClassName('edit')
+        kegiatanNew=input[0].value
+        hariNew=input[1].value
+        posterNew=input[2].value
+        listMadding[a].kegiatan=kegiatanNew
+        listMadding[a].hari=hariNew
+        listMadding[a].poster=posterNew
+        printAdmin(listMadding)
+    }
+    const logout=()=>{
+        document.getElementsByTagName('tbody')[0].innerHTML=''
+        document.getElementsByTagName('tfoot')[0].innerHTML=''
+        document.getElementsByTagName('h2')[0].innerHTML=''
+        document.getElementsByTagName('p')[0].innerHTML=''
+    }
+</script>
+</html>
